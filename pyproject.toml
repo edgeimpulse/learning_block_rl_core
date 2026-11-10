@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ei-robotics"
+version = "0.1.0"
+description = "Shared code for Edge Impulse custom learning blocks that train robot policies"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+# Lower bounds only: each block pins exact versions in its own requirements
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+# RL in simulation: the training telemetry, the simulation bundle
+rl = ["mujoco>=3.2", "pillow>=10"]
+# The Gymnasium + Stable-Baselines3 integration
+sb3 = ["ei-robotics[rl]", "stable-baselines3>=2.3", "torch>=2.2", "onnx>=1.15", "onnxruntime>=1.17"]
+
+[tool.setuptools.packages.find]
+include = ["ei_robotics*"]
