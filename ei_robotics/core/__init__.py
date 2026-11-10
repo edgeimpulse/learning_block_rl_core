@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """The Edge Impulse learning-block contract, for any kind of block (no RL or robotics code here)."""
 
 from .block import (CUSTOM_DATA_DIRECTORY, custom_data_directory, describe_dataset, out_directory, parse_args,

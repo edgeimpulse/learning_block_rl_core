@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """The simulation bundle: a copy of the simulation a policy trains in, so the RL policy simulator Studio
 extension can run the policy in the browser, in the physics it trained in.
 

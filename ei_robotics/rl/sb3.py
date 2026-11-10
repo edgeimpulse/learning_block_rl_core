@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """Gymnasium + Stable-Baselines3 PPO: the training monitor callback and the ONNX export.
 
 What the env provides (through the VecEnv's get_attr and the step infos):

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """The files blocks write for Studio and the extensions: the shapes the readers expect."""
 
 import contextlib

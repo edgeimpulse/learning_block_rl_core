@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """Shared code for Edge Impulse custom learning blocks that train robot policies.
 
 ei_robotics.core   the Studio learning-block contract (arguments, output files, custom data, Studio samples)

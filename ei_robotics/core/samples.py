@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """Studio samples: model inputs as Edge Impulse acquisition files, ready for edge-impulse-uploader.
 
 Each sample is one row of values, exactly the model input, so a project can show, test and profile the model

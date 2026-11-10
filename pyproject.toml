@@ -7,7 +7,7 @@ name = "ei-robotics"
 version = "0.1.0"
 description = "Shared code for Edge Impulse custom learning blocks that train robot policies"
 readme = "README.md"
-license = "BSD-3-Clause"
+license = "BSD-3-Clause-Clear"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 # Lower bounds only: each block pins exact versions in its own requirements

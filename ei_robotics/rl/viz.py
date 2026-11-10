@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """The rl-viz format: training telemetry for the RL training monitor Studio extension.
 
 The format belongs to the extension (rl_training_monitor_extension). This module writes it; a new field or file

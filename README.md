@@ -51,6 +51,16 @@ The archive URL needs no git in the image. The package's dependencies are lower 
 the exact versions it trains with. To change this code alongside a block, install your checkout over the
 pinned one: `pip install -e ../edgeimpulse-robotics`.
 
+**Torch on Linux.** The `[sb3]` extra needs torch. On Linux, the torch wheels on PyPI also install NVIDIA's CUDA
+libraries (`nvidia-*` packages, several GB, under NVIDIA's proprietary license) and triton. A block that trains on
+CPU installs the CPU-only wheels instead, by adding the PyTorch index to its requirements file and pinning a
+`+cpu` build:
+
+```text
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+```
+
 ## Using it from a block
 
 ```python
@@ -97,4 +107,4 @@ The tests need numpy only; the ones for `rl` run when mujoco and pillow are inst
 
 ## License
 
-[BSD 3-Clause](LICENSE)
+[The Clear BSD License](LICENSE). See [NOTICE](NOTICE) for the dependencies' licenses.

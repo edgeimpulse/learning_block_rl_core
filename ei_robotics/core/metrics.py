@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 """custom_training_metrics.json: numbers Studio shows on the learn block page and in Experiments."""
 
 import json
