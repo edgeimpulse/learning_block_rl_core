@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# Copyright (c) 2026 EdgeImpulse Inc.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 """The simulation bundle: a copy of the simulation a policy trains in, so the RL policy simulator Studio

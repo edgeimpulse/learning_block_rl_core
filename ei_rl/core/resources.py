@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# Copyright (c) 2026 EdgeImpulse Inc.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 """What the job's container may use. Studio jobs run in CPU- and memory-limited containers, where

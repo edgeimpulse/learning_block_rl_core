@@ -1,5 +1,5 @@
-edgeimpulse-robotics
-Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+learning_block_rl_core
+Copyright (c) 2026 EdgeImpulse Inc.
 
 This project is licensed under the Clear BSD License (SPDX: BSD-3-Clause-Clear); see LICENSE.
 
@@ -9,10 +9,10 @@ check each package for the version you install.
 
 Required
   numpy                BSD-3-Clause (bundled components: 0BSD, MIT, Zlib, CC0-1.0)
-
-Extra [rl]
-  mujoco               Apache-2.0
   pillow               MIT-CMU
+
+Extra [mujoco]
+  mujoco               Apache-2.0
 
 Extra [sb3]
   stable-baselines3    MIT

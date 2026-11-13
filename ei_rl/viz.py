@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# Copyright (c) 2026 EdgeImpulse Inc.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 """The rl-viz format: training telemetry for the RL training monitor Studio extension.
@@ -19,7 +19,7 @@ Two outputs, so the extension can show both a live view and a full report:
       eval.json                the benchmark of the exported policy (write_eval)
       snapshots/step_<n>.gif   the policy at training milestones
 
-RLViz is the trainer-agnostic part: a trainer integration (ei_robotics.rl.sb3, or a block's own) calls
+RLViz is the trainer-agnostic part: a trainer integration (ei_rl.sb3, or a block's own) calls
 start() once, log() once per iteration with the step count, and finish() at the end, and gives it `rollout`,
 which plays the current policy for a snapshot. RLViz decides when to snapshot and checkpoint.
 
@@ -35,8 +35,8 @@ from pathlib import Path
 
 import numpy as np
 
-from ..core.block import resolve_custom_data_dir
-from ..core.files import write_json
+from .core.block import resolve_custom_data_dir
+from .core.files import write_json
 
 FORMAT = "rl-viz"
 FORMAT_VERSION = 1

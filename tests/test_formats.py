@@ -1,10 +1,9 @@
-# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# Copyright (c) 2026 EdgeImpulse Inc.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 """The files blocks write for Studio and the extensions: the shapes the readers expect."""
 
 import contextlib
-import importlib.util
 import io
 import json
 import tempfile
@@ -13,9 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ei_robotics.core import parse_args, parser, write_samples, write_training_metrics
-
-HAS_RL = all(importlib.util.find_spec(m) for m in ("mujoco", "PIL"))
+from ei_rl.core import parse_args, parser, write_samples, write_training_metrics
 
 
 def quiet(f, *a, **kw):
@@ -50,10 +47,9 @@ class CoreTest(unittest.TestCase):
         self.assertEqual(files[1]["label"], {"type": "label", "label": "x"})
 
 
-@unittest.skipUnless(HAS_RL, "needs ei-robotics[rl]")
 class RLVizTest(unittest.TestCase):
     def run_viz(self, d, **kw):
-        from ei_robotics.rl.viz import RLViz
+        from ei_rl.viz import RLViz
 
         checkpoints = []
         viz = RLViz(d, total_timesteps=100, checkpoint=lambda *a: checkpoints.append(a), **kw)
@@ -85,7 +81,7 @@ class RLVizTest(unittest.TestCase):
         self.assertEqual([c[0] for c in checkpoints], [50, 100])  # not at step 0, once per step
 
     def test_eval_finishes_the_run(self):
-        from ei_robotics.rl.viz import write_eval
+        from ei_rl.viz import write_eval
 
         with tempfile.TemporaryDirectory() as d:
             self.run_viz(d)

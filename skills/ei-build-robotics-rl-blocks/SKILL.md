@@ -1,6 +1,6 @@
 ---
 name: ei-build-robotics-rl-blocks
-description: Build an Edge Impulse custom learning block that trains a robot policy with reinforcement learning in simulation (MuJoCo, Gymnasium, Stable-Baselines3 or another trainer), using the shared ei_robotics package. Covers the block layout, the Studio contract for a block without training data, the environment contract, training on a wall-clock budget, the ONNX export of the actor, the training telemetry for the RL training monitor extension (rl-viz, the task descriptor, snapshots), the simulation bundle and live checkpoints for the RL policy simulator extension (ei-rl-sim), the sim-to-sim evaluation, the Dockerfile, pinning, asset licenses, local tests and pushing. Use when asked to create, port, extend or debug an RL block for a new robot, task or trainer, or to add the monitor or simulator outputs to an existing one.
+description: Build an Edge Impulse custom learning block that trains a robot policy with reinforcement learning in simulation (MuJoCo, Gymnasium, Stable-Baselines3 or another trainer), using the shared ei_rl package. Covers the block layout, the Studio contract for a block without training data, the environment contract, training on a wall-clock budget, the ONNX export of the actor, the training telemetry for the RL training monitor extension (rl-viz, the task descriptor, snapshots), the simulation bundle and live checkpoints for the RL policy simulator extension (ei-rl-sim), the sim-to-sim evaluation, the Dockerfile, pinning, asset licenses, local tests and pushing. Use when asked to create, port, extend or debug an RL block for a new robot, task or trainer, or to add the monitor or simulator outputs to an existing one.
 ---
 
 Help the user build an Edge Impulse custom learning block that trains a robot policy by reinforcement learning.
@@ -15,7 +15,7 @@ two outputs for the Studio extensions:
   the policy trains in (`sim/scene.mjb.gz`, `sim/visual.bin.gz`, `sim/sim.json`), so the extension runs the policy
   in the browser, plus the **checkpoints** (`checkpoints/step_<n>.onnx`) it saves while it trains.
 
-The shared code is in this repository (`ei_robotics`). A block keeps only what is specific to its robot and task.
+The shared code is in this repository (`ei_rl`). A block keeps only what is specific to its robot and task.
 For the general learning-block rules (parameters.json, arguments, output files, Docker, push), see the
 `ei-build-custom-learning-blocks` skill; this one adds what is specific to RL.
 
@@ -23,9 +23,9 @@ For the general learning-block rules (parameters.json, arguments, output files, 
 
 `rl-viz` is specified in the training monitor's README (sections "Data format", "Task descriptor", "Adding a
 robot"), `ei-rl-sim` in the policy simulator's README ("Bundle format", "Live checkpoints", "Parity test").
-`ei_robotics` implements both. Never invent a field or a file in a block: if a task needs something new (an
+`ei_rl` implements both. Never invent a field or a file in a block: if a task needs something new (an
 observation kind, an actuator, a column), it is agreed with the extension's owner, added to the extension, then to
-`ei_robotics`. A block emits the formats only through `ei_robotics`, never with its own copy.
+`ei_rl`. A block emits the formats only through `ei_rl`, never with its own copy.
 
 Read those README sections before writing a task descriptor or a `sim.json`.
 
@@ -33,7 +33,7 @@ Read those README sections before writing a task descriptor or a `sim.json`.
 
 | Layer | Holds | Example |
 |---|---|---|
-| `ei_robotics` (this repo) | The Studio contract, the two formats, the trainer integrations | `RLViz`, `RLVizCallback`, `export_onnx`, `write_bundle` |
+| `ei_rl` (this repo) | The Studio contract, the two formats, the trainer integrations | `RLViz`, `RLVizCallback`, `export_onnx`, `write_bundle` |
 | The robot and task | The MJCF scene, the environment, the rewards, the randomization. Ideally usable without Edge Impulse | `miniauto_soccer_env.py`, a Gymnasium env; or an mjlab task registration |
 | The block | The Studio entry point and the task-specific glue for the extensions | `ei_train.py`, `rl_viz.py`, `sim_bundle.py`, `parameters.json`, `Dockerfile` |
 
@@ -59,7 +59,7 @@ Start from the closest existing block and replace the robot and the task, rather
   the block ignores them. Where Studio supports self-contained blocks (edgeimpulse PR #16421),
   `"operatesOn": "self_contained_freeform_output"` needs neither. Say in the description that the block needs no
   project data.
-- **Arguments.** Use `ei_robotics.core.parser` and `parse_args` (they add `--data-directory`, `--out-directory`,
+- **Arguments.** Use `ei_rl.core.parser` and `parse_args` (they add `--data-directory`, `--out-directory`,
   `--custom-data-directory` and ignore unknown arguments). Every `parameters.json` entry has a matching argument
   with the same default. Values arrive as strings: give `type=` in argparse.
 - **Typical parameters:** training timesteps (millions), max training time (minutes), learning rate, the task's
@@ -76,7 +76,7 @@ Start from the closest existing block and replace the robot and the task, rather
   worker's memory (each subprocess importing torch costs about 0.45 GB).
 
 ```python
-from ei_robotics.core import (custom_data_directory, default_workers, describe_dataset, out_directory,
+from ei_rl.core import (custom_data_directory, default_workers, describe_dataset, out_directory,
                               parse_args, parser, write_training_metrics)
 
 p = parser("My robot, PPO (Edge Impulse custom learning block)")
@@ -131,8 +131,8 @@ Design it for sim-to-real from the start, since the bundle has to describe all o
 checkpoints and finishes the run.
 
 ```python
-from ei_robotics.rl.sb3 import RLVizCallback
-from ei_robotics.rl.viz import RLViz
+from ei_rl.sb3 import RLVizCallback
+from ei_rl.viz import RLViz
 
 viz = RLViz(custom_data, total_timesteps=args.timesteps_millions * 1e6, max_minutes=args.max_minutes,
             task=task_info(), checkpoint=checkpoint,              # see the bundle section
@@ -169,7 +169,7 @@ The ONNX contract the extensions and the deployment rely on: input `"input"` `[1
 `"output"` `[1, act_dim]` in [-1, 1], observation normalization baked in, the actor only, opset 10, a single file.
 
 ```python
-from ei_robotics.rl.sb3 import export_onnx, verify_onnx
+from ei_rl.sb3 import export_onnx, verify_onnx
 
 export_onnx(model, vec_norm, out / "model.onnx", obs_dim=OBS_DIM)    # obs_dim: the actor's part, with a privileged critic
 verify_onnx(model, vec_norm, out / "model.onnx", MyRobotEnv(randomize=False), obs_dim=OBS_DIM)  # vs model.predict, 1e-4
@@ -263,7 +263,7 @@ run finished.
 and at the end; after training, `write_policy(custom_data, onnx_path)`.
 
 ```python
-from ei_robotics.rl.bundle import clear_policies, print_live_header, save_checkpoint, write_policy
+from ei_rl.bundle import clear_policies, print_live_header, save_checkpoint, write_policy
 
 live = False
 if custom_data is not None:
@@ -322,13 +322,13 @@ ENTRYPOINT ["python3", "-u", "ei_train.py"]
 - Pin exact versions in `requirements-block.txt` (torch CPU wheels from `--extra-index-url
   https://download.pytorch.org/whl/cpu`, mujoco, gymnasium, stable-baselines3, numpy, onnx, onnxruntime, pillow,
   pyopengl), and the same ones in the local `requirements.txt`.
-- Install `ei_robotics` from a fixed commit, no git needed in the image:
+- Install `ei_rl` from a fixed commit, no git needed in the image:
 
   ```text
-  ei-robotics[rl,sb3] @ https://github.com/edgeimpulse/edgeimpulse-robotics/archive/<commit>.tar.gz
+  ei-rl[mujoco,sb3] @ https://github.com/edgeimpulse/learning_block_rl_core/archive/<commit>.tar.gz
   ```
 
-  To change it alongside a block, install a checkout over the pin: `pip install -e ../edgeimpulse-robotics`.
+  To change it alongside a block, install a checkout over the pin: `pip install -e ../learning_block_rl_core`.
 - An external robot package or task library (e.g. an mjlab task) is pinned to a commit and installed at build
   time.
 
@@ -364,7 +364,7 @@ ENTRYPOINT ["python3", "-u", "ei_train.py"]
 - **Unit-sized checks** while developing: `python sim_bundle.py --out /tmp/sim --check [--onnx model.onnx]`, and
   `python -m unittest discover tests` in this repo.
 
-**Refactoring a block** (moving code into `ei_robotics`, renaming, reordering): run the old and the new code with
+**Refactoring a block** (moving code into `ei_rl`, renaming, reordering): run the old and the new code with
 the same seed and a short training on one process, and compare everything except wall-clock fields (`time`,
 `fps`, `updated`): every `[rl-...]` log line, `manifest.json`, `metrics.json`, `eval.json`, the GIFs, the
 checkpoints, `model.onnx` and `sim/` byte for byte. Run the old code twice first to confirm it is deterministic.
@@ -373,7 +373,7 @@ checkpoints, `model.onnx` and `sim/` byte for byte. Run the old code twice first
 
 - `parse_args` with unknown arguments: Studio passes more than the block declares.
 - Worker count from `os.cpu_count()`, or one worker per CPU without checking memory: the job is killed.
-- Files the extensions read while the job runs are written to a temporary name, then renamed (`ei_robotics`
+- Files the extensions read while the job runs are written to a temporary name, then renamed (`ei_rl`
   does this); a block's own files there do the same.
 - Leftovers of a previous run in the custom data: clear `snapshots/`, `checkpoints/` and `policy/` at the start
   (`RLViz.start` and `clear_policies` do).
@@ -402,14 +402,14 @@ the push; they are not in `parameters.json`.
    Look for an existing block with a similar robot or task to start from.
 2. Build and test the environment on its own first (`train.py`, a short run that learns something), then wrap it
    in `ei_train.py`.
-3. Use `ei_robotics` for everything it covers; don't copy its code into the block. If the block needs a change
+3. Use `ei_rl` for everything it covers; don't copy its code into the block. If the block needs a change
    in it, make it there, keeping the formats unchanged.
 4. Write `task_info()` and `rollout_snapshot()` from the monitor's README, and `describe()` from the simulator's
    "Bundle format". If the robot needs a kind the simulator doesn't have, say so and stop at the telemetry until
    the extension supports it.
 5. Make `sim_bundle.py --check` pass and run it in the Dockerfile.
 6. Verify the ONNX export, evaluate the ONNX model on a fixed benchmark, and write the headline metrics.
-7. Pin every dependency, `ei_robotics` to a commit, and check asset licenses before anything is committed.
+7. Pin every dependency, `ei_rl` to a commit, and check asset licenses before anything is committed.
 8. Run a short training in the image with `--network=none`, open the outputs in both extensions locally, then
    push.
 9. Document in the block's README: the task, the observation and action, the rewards, the randomization, what a

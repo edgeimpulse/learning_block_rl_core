@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
+# Copyright (c) 2026 EdgeImpulse Inc.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 """Gymnasium + Stable-Baselines3 PPO: the training monitor callback and the ONNX export.
@@ -186,7 +186,7 @@ def export_onnx(model, vec_norm, path, obs_dim=None):
 def verify_onnx(model, vec_norm, path, env, obs_dim=None, n=256, seed=123, tolerance=1e-4):
     """Check the ONNX model matches SB3's deterministic predict on `n` observations of `env` (a Gymnasium env
     making the training's observations), played by the trained policy."""
-    from ..core.onnx import onnx_policy
+    from .core.onnx import onnx_policy
 
     obs_dim = obs_dim or actor_obs_dim(model, vec_norm)
     obs, _ = env.reset(seed=seed)
