@@ -144,7 +144,24 @@ model.learn(total_timesteps=int(args.timesteps_millions * 1e6), callback=[callba
 `rollout(policy, render)` gets `policy(obs) -> action` on raw observations (the callback applies the current
 `VecNormalize` statistics) and returns `(frames, stats)`.
 
-**Another trainer** (rsl_rl, skrl, a custom loop): call `RLViz` yourself and set its `rollout`.
+**mjlab + rsl_rl:** `ei_rl.mjlab.RslRlViz` wraps the runner's logger (rsl_rl has no callbacks). It reads the
+reward weights and the time-out terminations from the task's managers, logs every PPO iteration, and stops at
+the time budget.
+
+```python
+from ei_rl.mjlab import RslRlViz, checkpoint
+
+viz = RLViz(custom_data, total_timesteps=iterations * num_steps_per_env * num_envs, max_minutes=args.max_minutes,
+            task=task_info(), checkpoint=checkpoint(runner, custom_data))
+hook = RslRlViz(viz, rollout=rollout_snapshot)   # rollout_snapshot(policy, render) -> (frames, stats)
+hook.attach(runner, env)
+model_pt = hook.learn(iterations, init_at_random_ep_len=True)
+hook.finish()
+```
+
+The rollout gets the runner's deterministic policy (in eval mode) and plays it in the block's own test env.
+
+**Another trainer** (skrl, a custom loop): call `RLViz` yourself and set its `rollout`.
 
 ```python
 viz.rollout = lambda render: rollout_snapshot(current_policy(), render=render)

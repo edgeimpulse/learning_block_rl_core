@@ -33,9 +33,11 @@ ei-rl[mujoco,sb3] @ https://github.com/edgeimpulse/learning_block_rl_core/archiv
 | (none) | numpy, pillow | `ei_rl.core`, `ei_rl.viz` |
 | `mujoco` | mujoco | `ei_rl.bundle` |
 | `sb3` | Stable-Baselines3, torch, onnx, onnxruntime | `ei_rl.sb3` |
+| `mjlab` | mjlab (with rsl_rl, torch, mujoco) | `ei_rl.mjlab`, `ei_rl.bundle` |
 
 The archive URL needs no git in the image. The package's dependencies are lower bounds only; the block pins
-the exact versions it trains with. To change this code alongside a block, install your checkout over the
+the exact versions it trains with. An mjlab block usually gets mjlab from its robot package's lock file and
+installs `ei-rl` into that environment, which keeps those versions. To change this code alongside a block, install your checkout over the
 pinned one: `pip install -e ../learning_block_rl_core`.
 
 **Torch on Linux.** The `[sb3]` extra needs torch. On Linux, the torch wheels on PyPI also install NVIDIA's CUDA
@@ -68,8 +70,24 @@ export_onnx(model, vec_norm, out / "model.onnx")
 ```
 
 The env provides `reward_scales` (term -> weight) and `control_dt` as attributes, each reward term's value in
-the step info, and `is_failure` / `is_success` in the last info of an episode. Another trainer gets the same
-outputs by calling `RLViz.start`, `log` and `finish` itself.
+the step info, and `is_failure` / `is_success` in the last info of an episode.
+
+With mjlab and rsl_rl, `RslRlViz` hooks the runner instead; the reward terms and time-outs come from the task's
+managers:
+
+```python
+from ei_rl.mjlab import RslRlViz, checkpoint
+
+runner = OnPolicyRunner(env, agent_cfg, log_dir, device)
+viz = RLViz(custom_data, total_timesteps=iterations * agent_cfg["num_steps_per_env"] * num_envs,
+            max_minutes=args.max_minutes, task=my_task_info(), checkpoint=checkpoint(runner, custom_data))
+hook = RslRlViz(viz, rollout=my_snapshot)              # my_snapshot(policy, render) -> (frames, stats)
+hook.attach(runner, env)
+model_pt = hook.learn(iterations, init_at_random_ep_len=True)   # stops at the time budget
+hook.finish()
+```
+
+Another trainer gets the same outputs by calling `RLViz.start`, `log` and `finish` itself.
 
 ## Modules
 
@@ -79,6 +97,7 @@ outputs by calling `RLViz.start`, `log` and `finish` itself.
 | `ei_rl.viz` | The training telemetry for the monitor (`RLViz`, `write_eval`), whatever the trainer, and when to take snapshots and checkpoints | |
 | `ei_rl.bundle` | The simulation bundle for the simulator: the physics model without its visual-only geoms (`physics_model`), the decimated visuals (`visual_model`), writing `sim/` (`write_bundle`), and the checkpoints (`save_checkpoint`) | `[mujoco]` |
 | `ei_rl.sb3` | Gymnasium + Stable-Baselines3: `RLVizCallback` and the ONNX export of the actor with its observation normalization | `[sb3]` |
+| `ei_rl.mjlab` | mjlab + rsl_rl: `RslRlViz` (the runner's logger hook and the time budget) and `checkpoint` (mjlab's ONNX export) | `[mjlab]` |
 
 `ei_rl.core` imports nothing from the other modules, and has no RL code: a block that isn't RL can use it alone.
 
@@ -114,7 +133,8 @@ directory (for Claude Code, `~/.claude/skills/`), or read it as a plain guide.
 python -m unittest discover tests
 ```
 
-The tests need numpy only. They cover `ei_rl.core` and `ei_rl.viz`; `ei_rl.bundle` and `ei_rl.sb3` have no tests yet.
+The tests need numpy only. They cover `ei_rl.core`, `ei_rl.viz` and the `ei_rl.mjlab` hook (with a stand-in
+runner); `ei_rl.bundle` and `ei_rl.sb3` have no tests yet.
 
 ## License
 

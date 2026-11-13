@@ -18,6 +18,8 @@ dependencies = ["numpy>=1.24", "pillow>=10"]
 mujoco = ["mujoco>=3.2"]
 # The Gymnasium + Stable-Baselines3 integration (ei_rl.sb3)
 sb3 = ["stable-baselines3>=2.3", "torch>=2.2", "onnx>=1.15", "onnxruntime>=1.17"]
+# The mjlab + rsl_rl integration (ei_rl.mjlab); mjlab brings rsl_rl, torch and mujoco
+mjlab = ["mjlab>=1.3"]
 
 [tool.setuptools.packages.find]
 include = ["ei_rl*"]

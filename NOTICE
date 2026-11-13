@@ -21,7 +21,18 @@ Extra [sb3]
   onnx                 Apache-2.0
   onnxruntime          MIT
 
-Their dependencies include gymnasium (MIT), absl-py (Apache-2.0), protobuf (BSD-3-Clause), sympy (BSD-3-Clause),
+Extra [mjlab]
+  mjlab                Apache-2.0
+  rsl-rl-lib           BSD-3-Clause
+  mujoco-warp          Apache-2.0
+  warp-lang            Apache-2.0
+  torch                as above
+
+mjlab also pulls in viewer, logging and media tools (viser, wandb, tensorboard, trimesh, mediapy,
+imageio-ffmpeg, among others). imageio-ffmpeg ships an ffmpeg binary under ffmpeg's own license; an mjlab
+block usually installs all of these from its robot package's lock file, so check them there.
+
+The [sb3] dependencies include gymnasium (MIT), absl-py (Apache-2.0), protobuf (BSD-3-Clause), sympy (BSD-3-Clause),
 networkx (BSD-3-Clause), jinja2 (BSD-3-Clause) and cloudpickle (BSD-3-Clause). None is GPL-licensed.
 
 On Linux, the torch wheels on PyPI also install NVIDIA CUDA libraries (nvidia-* packages, under NVIDIA's
